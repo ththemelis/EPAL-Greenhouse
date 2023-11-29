@@ -2,7 +2,8 @@
 //  https://randomnerdtutorials.com/esp32-websocket-server-arduino/
 //  https://randomnerdtutorials.com/esp32-websocket-server-sensor/
 
-// Αλλαγή των κουμπιών (από τις βάνες) για να λειτουργούν όπως οι sliders 
+// Αλλαγή των κουμπιών (από τις βάνες) για να λειτουργούν όπως οι sliders
+// Προσθήκη φίλτρου για αφαίρεση μη αποδεκτών τιμών από τους αισθητήρες (moving average?)
 
 #include <WiFi.h>
 #include <WiFiMulti.h>
@@ -11,62 +12,62 @@
 #include "SPIFFS.h"
 #include <Arduino_JSON.h>
 #include "SparkFunBME280.h"
+#include "TickTwo.h"
+
+String getSensorReadings();
+
+TickTwo readingsTimer(getSensorReadings, 30000);
 
 bool ledState = 0;
 #define ledPin 2
 
-WiFiMulti wifiMulti;
-AsyncWebServer server(80);  // Create AsyncWebServer object on port 80
-AsyncWebSocket ws("/ws");   // Create a WebSocket object
-
-// Json Variable to Hold Sensor Readings
-JSONVar readings;
-
-// Timer variables
-unsigned long lastTime = 0;
-unsigned long timerDelay = 30000;
-
-BME280 bme;
-
-// Init BME280
-void initBME(){
-  Wire.begin();
-  if (!bme.beginI2C()) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    while (1);
-  }
-}
-
-// Get Sensor Readings and return JSON object
-String getSensorReadings(){
-  readings["temperature"] = String(bme.readTempC());
-  readings["humidity"] =  String(bme.readFloatHumidity());
-  readings["pressure"] = String(1);
-  String jsonString = JSON.stringify(readings);  
-  return jsonString;
-}
-
-// Initialize SPIFFS
-void initSPIFFS() {
-  if (!SPIFFS.begin(true)) {
-    Serial.println("An error has occurred while mounting SPIFFS");
-  }
-  Serial.println("SPIFFS mounted successfully");
-}
-
-// Initialize WiFi
-void initWiFi() {
+WiFiMulti wifiMulti;    //
+AsyncWebServer server(80);  // Δημιουργία αντικειμένου για τον Web Server (πόρτα 80)
+AsyncWebSocket ws("/ws");   // Δημιουργία αντικειμένου WebSocket
+void initWiFi() {   // Συνάρτηση ενεργοποίησης και σύνδεσης του WiFi
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP("argos", "21040672bill");
   wifiMulti.addAP("theo", "21040672bill");
   wifiMulti.addAP(" Galaxy S23", "1234512345qw");
-  while(wifiMulti.run() != WL_CONNECTED) {
+  while (wifiMulti.run() != WL_CONNECTED) {
     delay(100);
     Serial.print(".");
   }
   Serial.println("Συνδέθηκε στο δίκτυο WiFi");
   Serial.print("Διεύθυνση IP: ");
   Serial.println(WiFi.localIP());
+}
+
+JSONVar readings;   // Μεταβλητή Json για την αποθήκευση των μετρήσεων
+
+// Timer variables
+unsigned long lastTime = 0;
+unsigned long timerDelay = 30000;
+
+BME280 bme;   // Δημιουργία αντικειμένου για τον αισθητήρα BME280
+void initBME() {  // Συνάρτηση ενεργοποίησης του αισθητήρα BME280
+  Wire.begin();
+  if (!bme.beginI2C()) {
+    Serial.println("Ο αισθητήρας BME280 δεν βρέθηκε (Έλεγχος της καλωδίωσης)");
+    while (1);
+  }
+}
+
+String getSensorReadings() {  // Get Sensor Readings and return JSON object
+  Serial.println("Readings");
+  readings["temperature"] = String(bme.readTempC());
+  readings["humidity"] =  String(bme.readFloatHumidity());
+  readings["pressure"] = String(1);
+  String jsonString = JSON.stringify(readings);
+  notifyClients(jsonString);  //
+  return jsonString;
+}
+
+void initSPIFFS() {   // Initialize SPIFFS
+  if (!SPIFFS.begin(true)) {
+    Serial.println("An error has occurred while mounting SPIFFS");
+  }
+  Serial.println("SPIFFS mounted successfully");
 }
 
 void notifyClients(String sensorReadings) {
@@ -126,23 +127,23 @@ void setup() {
   initWebSocket();
 
   // Web Server Root URL
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(SPIFFS, "/index.html", "text/html");
   });
 
   server.serveStatic("/", SPIFFS, "/");
 
-  // Start server
-  server.begin();
+  server.begin();   // Start server
+  readingsTimer.start();
 }
 
 void loop() {
-  if ((millis() - lastTime) > timerDelay) {
-    String sensorReadings = getSensorReadings();
-    Serial.println(sensorReadings);
-    notifyClients(sensorReadings);
-    lastTime = millis();
-  }
-  //digitalWrite(ledPin, ledState);
+  readingsTimer.update();
+//  if ((millis() - lastTime) > timerDelay) {
+//    String sensorReadings = getSensorReadings();
+//    Serial.println(sensorReadings);
+//    notifyClients(sensorReadings);
+//    lastTime = millis();
+//  }
   ws.cleanupClients();
 }

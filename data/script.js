@@ -17,7 +17,9 @@ function initButton() {
     document.getElementById('valve5').addEventListener('click', toggle);
 }
 
-function toggle(){
+function toggle(element){
+    var btnNumber = element.id.charAt(element.id.length-1);
+    console.log(btnNumber+"b");
     if (document.getElementById('state1').innerHTML == "Κλειστή"){
         document.getElementById('state1').innerHTML = "Ανοιχτή"
     }
@@ -43,7 +45,7 @@ function initWebSocket() {
 function onOpen(event) {
     console.log('Connection opened');
     getReadings();
-    initButton();
+    //initButton();
 }
 
 function onClose(event) {
