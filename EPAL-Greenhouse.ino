@@ -38,11 +38,15 @@ void initWiFi() {   // Συνάρτηση ενεργοποίησης και σύ
   Serial.println(WiFi.localIP());
 }
 
-JSONVar readings;   // Μεταβλητή Json για την αποθήκευση των μετρήσεων
+JSONVar readings;   // Μεταβλητή JSON για την αποθήκευση των μετρήσεων
+JSONVar valveValues;
+String message = "";
+String valve1 = "0";
+String valve2 = "0";
 
 // Timer variables
-unsigned long lastTime = 0;
-unsigned long timerDelay = 30000;
+//unsigned long lastTime = 0;
+//unsigned long timerDelay = 30000;
 
 BME280 bme;   // Δημιουργία αντικειμένου για τον αισθητήρα BME280
 void initBME() {  // Συνάρτηση ενεργοποίησης του αισθητήρα BME280
@@ -54,12 +58,22 @@ void initBME() {  // Συνάρτηση ενεργοποίησης του αισ
 }
 
 String getSensorReadings() {  // Get Sensor Readings and return JSON object
-  Serial.println("Readings");
   readings["temperature"] = String(bme.readTempC());
   readings["humidity"] =  String(bme.readFloatHumidity());
   readings["pressure"] = String(1);
+
   String jsonString = JSON.stringify(readings);
   notifyClients(jsonString);  //
+  Serial.println(jsonString);
+  return jsonString;
+}
+
+String getValveValues() {
+  valveValues["valve1"] = String(valve1);
+  valveValues["valve2"] = String(valve2);
+
+  String jsonString = JSON.stringify(valveValues);
+  Serial.println(jsonString);
   return jsonString;
 }
 
@@ -78,19 +92,40 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
-    //String message = (char*)data;
+    String message = (char*)data;
+
+    if (message.indexOf("1b") >= 0) {
+      valve1 = message.substring(2);
+      //dutyCycle1 = map(sliderValue1.toInt(), 0, 100, 0, 255);
+      //Serial.println(dutyCycle1);
+      //      Serial.println(valve1);
+      //      Serial.print(getValveValues());
+      ledState = !ledState;
+      digitalWrite(ledPin, ledState);
+      notifyClients(String(ledState));
+      notifyClients(getValveValues());
+    }
+    if (message.indexOf("2b") >= 0) {
+      valve2 = message.substring(2);
+      notifyClients(getValveValues());
+    }
     // Check if the message is "getReadings"
     if (strcmp((char*)data, "getReadings") == 0) {  //if it is, send current sensor readings
       String sensorReadings = getSensorReadings();
-      Serial.print(sensorReadings);
+      //Serial.print(sensorReadings);
       notifyClients(sensorReadings);
     }
-    if (strcmp((char*)data, "toggle") == 0) {
-      ledState = !ledState;
-      digitalWrite(ledPin, ledState);
-      Serial.println(ledState);
-      notifyClients(String(ledState));
+    if (strcmp((char*)data, "getValveValues") == 0) {  //if it is, send current sensor readings
+      String valveReadings = getValveValues();
+      //Serial.print(sensorReadings);
+      notifyClients(valveReadings);
     }
+    //    if (strcmp((char*)data, "toggle") == 0) {
+    //      ledState = !ledState;
+    //      digitalWrite(ledPin, ledState);
+    //      Serial.println(ledState);
+    //      notifyClients(String(ledState));
+    //    }
   }
 }
 
@@ -139,11 +174,11 @@ void setup() {
 
 void loop() {
   readingsTimer.update();
-//  if ((millis() - lastTime) > timerDelay) {
-//    String sensorReadings = getSensorReadings();
-//    Serial.println(sensorReadings);
-//    notifyClients(sensorReadings);
-//    lastTime = millis();
-//  }
+  //  if ((millis() - lastTime) > timerDelay) {
+  //    String sensorReadings = getSensorReadings();
+  //    Serial.println(sensorReadings);
+  //    notifyClients(sensorReadings);
+  //    lastTime = millis();
+  //  }
   ws.cleanupClients();
 }

@@ -9,13 +9,13 @@ h1 {
 }
 .topnav {
     overflow: hidden;
-    background-color: #0A1128;
+    background-color: #086825;
 }
 body {
     margin: 0;
 }
 .content {
-    padding: 50px;
+    padding: 20px;
 }
 .card-grid {
     max-width: 800px;
