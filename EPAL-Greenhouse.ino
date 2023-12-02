@@ -16,7 +16,7 @@
 
 String getSensorReadings();
 
-TickTwo readingsTimer(getSensorReadings, 30000);
+TickTwo readingsTimer(getSensorReadings, 15000);
 
 bool ledState = 0;
 #define ledPin 2
@@ -96,30 +96,29 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 
     if (message.indexOf("1b") >= 0) {
       valve1 = message.substring(2);
-      //dutyCycle1 = map(sliderValue1.toInt(), 0, 100, 0, 255);
-      //Serial.println(dutyCycle1);
-      //      Serial.println(valve1);
-      //      Serial.print(getValveValues());
       ledState = !ledState;
       digitalWrite(ledPin, ledState);
-      notifyClients(String(ledState));
       notifyClients(getValveValues());
     }
     if (message.indexOf("2b") >= 0) {
       valve2 = message.substring(2);
       notifyClients(getValveValues());
     }
+//    if (message.indexOf("getReadings") >= 0) {
+//      String sensorReadings = getSensorReadings();
+//      notifyClients(sensorReadings);      
+//    }
     // Check if the message is "getReadings"
     if (strcmp((char*)data, "getReadings") == 0) {  //if it is, send current sensor readings
       String sensorReadings = getSensorReadings();
       //Serial.print(sensorReadings);
       notifyClients(sensorReadings);
     }
-    if (strcmp((char*)data, "getValveValues") == 0) {  //if it is, send current sensor readings
-      String valveReadings = getValveValues();
-      //Serial.print(sensorReadings);
-      notifyClients(valveReadings);
-    }
+//    if (strcmp((char*)data, "getValveValues") == 0) {  //if it is, send current sensor readings
+//      String valveReadings = getValveValues();
+//      //Serial.print(sensorReadings);
+//      notifyClients(valveReadings);
+//    }
     //    if (strcmp((char*)data, "toggle") == 0) {
     //      ledState = !ledState;
     //      digitalWrite(ledPin, ledState);

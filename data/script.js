@@ -6,35 +6,20 @@ window.addEventListener('load', onload);
 
 function onload(event) {
     initWebSocket();
-    //initButton();
 }
-
-// function initButton() {
-//     document.getElementById('valve1').addEventListener('click', toggle);
-//     document.getElementById('valve2').addEventListener('click', toggle);
-//     document.getElementById('valve3').addEventListener('click', toggle);
-//     document.getElementById('valve4').addEventListener('click', toggle);
-//     document.getElementById('valve5').addEventListener('click', toggle);
-// }
 
 function toggle(element){
     var valveNumber = element.id.charAt(element.id.length-1);
     //var valveState;
     if (document.getElementById('state'+valveNumber).innerHTML == "Κλειστή"){
-        document.getElementById('state'+valveNumber).innerHTML = "Ανοιχτή";
         valveState=1;
-    }
-    else {
-        document.getElementById('state'+valveNumber).innerHTML = "Κλειστή";
+    } else {
         valveState=0;
     }
-    //websocket.send("toggle");
     websocket.send(valveNumber+"b"+valveState);
-    // websocket.send(valveNumber+"b");
-    console.log(valveNumber+"b"+valveState);
 }
 
-function getReadings(){
+function getReadings(){     // Κλήση της συνάρτησης για την λήψη μετρήσεων από τους αισθητήρες
     websocket.send("getReadings");
 }
 
@@ -46,15 +31,13 @@ function initWebSocket() {
     websocket.onmessage = onMessage;
 }
 
-// When websocket is established, call the getReadings() function
-function onOpen(event) {
+function onOpen(event) {    // Η συνάρτηση τρέχει μετά την πραγματοποίηση της σύνδεσης
     console.log('Connection opened');
     getReadings();
     websocket.send("getValveValues");
-    //initButton();
 }
 
-function onClose(event) {
+function onClose(event) {   // Η συνάρτηση τρέχει μετά το κλείσιμο της σύνδεσης
     console.log('Connection closed');
     setTimeout(initWebSocket, 2000);
 }
@@ -69,16 +52,27 @@ function updateSliderPWM(element) {
 
 // Function that receives the message from the ESP32 with the readings
 function onMessage(event) {
-    //console.log(event.data);
-    var state;
     var myObj = JSON.parse(event.data);
     var keys = Object.keys(myObj);
 
-    for (var i = 0; i < keys.length; i++){
-        var key = keys[i];
-        // if (key == 'temperature' || key == "humidity" || key == "state1") {
-            document.getElementById(key).innerHTML = myObj[key];
-            console.log(myObj[key]);
-        // }
+    console.log(event.data);
+    if (!isNaN(myObj['temperature'])) {
+        document.getElementById('temperature').innerHTML = myObj["temperature"]; }
+    if (!isNaN(myObj['humidity'])) {
+        document.getElementById('humidity').innerHTML = myObj['humidity']; }
+
+    if (myObj['valve1']) {
+        if (myObj['valve1']==1) {
+            document.getElementById('state1').innerHTML = "Ανοιχτή";
+        } else {
+            document.getElementById('state1').innerHTML = "Κλειστή";
+        }
+    }
+    if (myObj['valve2']) {
+        if (myObj['valve2']==1) {
+            document.getElementById('state2').innerHTML = "Ανοιχτή";
+        } else {
+            document.getElementById('state2').innerHTML = "Κλειστή";
+        }
     }
 }
