@@ -14,6 +14,7 @@
     <div class="topnav">
         <h1>ΕΠΑΛ Καστοριάς - Greenhouse Panel</h1>
     </div>
+
     <div class="content">
         <div class="card-grid">
             <div class="card">
@@ -22,11 +23,11 @@
             </div>
             <div class="card">
                 <p class="card-title">Σχετική υγρασία</p>
-                <p class="reading"><span id="humidity"></span> &percnt;</p>
+                <p class="reading"><span id="air-humidity"></span> &percnt;</p>
             </div>
             <div class="card">
-                <p class="card-title">Pressure</p>
-                <p class="reading"><span id="pressure"></span> hpa</p>
+                <p class="card-title">Υγρασία εδάφους</p>
+                <p class="reading"><span id="gnd-humidity"></span> &percnt;</p>
             </div>
         </div>
     </div>
@@ -34,20 +35,20 @@
     <div class="content">
         <div class="card-grid">
             <div class="card">
-                <p class="card-title">Fader 1</p>
+                <p class="card-title">Όριο θερμοκρασίας αέρα</p>
                 <p class="switch">
                     <input type="range" onchange="updateSliderPWM(this)" id="slider1" min="0" max="100" step="1"
                         value="0" class="slider">
                 </p>
-                <p class="state">Brightness: <span id="sliderValue1"></span> &percnt;</p>
+                <p class="state"><span id="sliderValue1"></span> &deg; C</p>
             </div>
             <div class="card">
-                <p class="card-title">Fader 2</p>
+                <p class="card-title">Όριο σχετικής υγρασίας</p>
                 <p class="switch">
                     <input type="range" onchange="updateSliderPWM(this)" id="slider2" min="0" max="100" step="1"
                         value="0" class="slider">
                 </p>
-                <p class="state">Brightness: <span id="sliderValue2"></span> &percnt;</p>
+                <p class="state"><span id="sliderValue2"></span> &percnt;</p>
             </div>
         </div>
     </div>

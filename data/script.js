@@ -10,7 +10,6 @@ function onload(event) {
 
 function toggle(element){
     var valveNumber = element.id.charAt(element.id.length-1);
-    //var valveState;
     if (document.getElementById('state'+valveNumber).innerHTML == "Κλειστή"){
         valveState=1;
     } else {
@@ -31,13 +30,13 @@ function initWebSocket() {
     websocket.onmessage = onMessage;
 }
 
-function onOpen(event) {    // Η συνάρτηση τρέχει μετά την πραγματοποίηση της σύνδεσης
+function onOpen(event) {    // Η συνάρτηση τρέχει μετά την πραγματοποίηση μιας σύνδεσης
     console.log('Connection opened');
     getReadings();
     websocket.send("getValveValues");
 }
 
-function onClose(event) {   // Η συνάρτηση τρέχει μετά το κλείσιμο της σύνδεσης
+function onClose(event) {   // Η συνάρτηση τρέχει μετά το κλείσιμο μιας σύνδεσης
     console.log('Connection closed');
     setTimeout(initWebSocket, 2000);
 }
@@ -58,8 +57,8 @@ function onMessage(event) {
     console.log(event.data);
     if (!isNaN(myObj['temperature'])) {
         document.getElementById('temperature').innerHTML = myObj["temperature"]; }
-    if (!isNaN(myObj['humidity'])) {
-        document.getElementById('humidity').innerHTML = myObj['humidity']; }
+    if (!isNaN(myObj['air-humidity'])) {
+        document.getElementById('air-humidity').innerHTML = myObj['air-humidity']; }
 
     if (myObj['valve1']) {
         if (myObj['valve1']==1) {
@@ -73,6 +72,27 @@ function onMessage(event) {
             document.getElementById('state2').innerHTML = "Ανοιχτή";
         } else {
             document.getElementById('state2').innerHTML = "Κλειστή";
+        }
+    }
+    if (myObj['valve3']) {
+        if (myObj['valve3']==1) {
+            document.getElementById('state3').innerHTML = "Ανοιχτή";
+        } else {
+            document.getElementById('state3').innerHTML = "Κλειστή";
+        }
+    }
+    if (myObj['valve4']) {
+        if (myObj['valve4']==1) {
+            document.getElementById('state4').innerHTML = "Ανοιχτή";
+        } else {
+            document.getElementById('state4').innerHTML = "Κλειστή";
+        }
+    }
+    if (myObj['valve5']) {
+        if (myObj['valve5']==1) {
+            document.getElementById('state5').innerHTML = "Ανοιχτή";
+        } else {
+            document.getElementById('state5').innerHTML = "Κλειστή";
         }
     }
 }

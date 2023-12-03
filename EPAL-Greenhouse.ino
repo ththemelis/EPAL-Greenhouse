@@ -1,7 +1,9 @@
 //  https://randomnerdtutorials.com/esp32-web-server-websocket-sliders/
 //  https://randomnerdtutorials.com/esp32-websocket-server-arduino/
 //  https://randomnerdtutorials.com/esp32-websocket-server-sensor/
+//  https://m1cr0lab-esp32.github.io/remote-control-with-websocket/web-ui-design/
 
+// Αλλαγή της toggle
 // Αλλαγή των κουμπιών (από τις βάνες) για να λειτουργούν όπως οι sliders
 // Προσθήκη φίλτρου για αφαίρεση μη αποδεκτών τιμών από τους αισθητήρες (moving average?)
 
@@ -16,12 +18,21 @@
 
 String getSensorReadings();
 
-TickTwo readingsTimer(getSensorReadings, 15000);
+TickTwo readingsTimer(getSensorReadings, 15000);  // Δημιουργία αντικειμένου για την λήψη τιμών σε τακτά διαστήματα
+TickTwo valvesTimer(getValveValues, 10000);
+
+String changeValve() {   // Λήψη της κατάστασης των βανών και επιστροφή τους με την μορφή JSON
+  valveValues["valve1"] = String(valve1);
+
+  String jsonString = JSON.stringify(valveValues);
+  Serial.println(jsonString);
+  return jsonString;
+}
 
 bool ledState = 0;
 #define ledPin 2
 
-WiFiMulti wifiMulti;    //
+WiFiMulti wifiMulti;    // Δημιουργία αντικειμένου για το WiFi
 AsyncWebServer server(80);  // Δημιουργία αντικειμένου για τον Web Server (πόρτα 80)
 AsyncWebSocket ws("/ws");   // Δημιουργία αντικειμένου WebSocket
 void initWiFi() {   // Συνάρτηση ενεργοποίησης και σύνδεσης του WiFi
@@ -43,10 +54,9 @@ JSONVar valveValues;
 String message = "";
 String valve1 = "0";
 String valve2 = "0";
-
-// Timer variables
-//unsigned long lastTime = 0;
-//unsigned long timerDelay = 30000;
+String valve3 = "0";
+String valve4 = "0";
+String valve5 = "0";
 
 BME280 bme;   // Δημιουργία αντικειμένου για τον αισθητήρα BME280
 void initBME() {  // Συνάρτηση ενεργοποίησης του αισθητήρα BME280
@@ -57,35 +67,38 @@ void initBME() {  // Συνάρτηση ενεργοποίησης του αισ
   }
 }
 
-String getSensorReadings() {  // Get Sensor Readings and return JSON object
+String getSensorReadings() {  // Λήψη τιμών από τους αισθητήρες και επιστροφή τους με την μορφή JSON
   readings["temperature"] = String(bme.readTempC());
-  readings["humidity"] =  String(bme.readFloatHumidity());
-  readings["pressure"] = String(1);
+  readings["air-humidity"] =  String(bme.readFloatHumidity());
+  readings["gnd-humidity"] = String(1);
 
   String jsonString = JSON.stringify(readings);
-  notifyClients(jsonString);  //
+  notifyClients(jsonString);
   Serial.println(jsonString);
   return jsonString;
 }
 
-String getValveValues() {
+String getValveValues() {   // Λήψη της κατάστασης των βανών και επιστροφή τους με την μορφή JSON
   valveValues["valve1"] = String(valve1);
   valveValues["valve2"] = String(valve2);
+  valveValues["valve3"] = String(valve3);
+  valveValues["valve4"] = String(valve4);
+  valveValues["valve5"] = String(valve5);
 
   String jsonString = JSON.stringify(valveValues);
   Serial.println(jsonString);
   return jsonString;
 }
 
-void initSPIFFS() {   // Initialize SPIFFS
+void initSPIFFS() {   // Αρχικοποίηση του χώρου αποθήκευσης SPIFFS
   if (!SPIFFS.begin(true)) {
-    Serial.println("An error has occurred while mounting SPIFFS");
+    Serial.println("Δεν ήταν δυνατή η προσάρτηση του SPIFFS");
   }
-  Serial.println("SPIFFS mounted successfully");
+  Serial.println("Το SPIFFS προσαρτήθηκε με επιτυχία");
 }
 
-void notifyClients(String sensorReadings) {
-  ws.textAll(sensorReadings);
+void notifyClients(String readings) {
+  ws.textAll(readings);
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
@@ -104,16 +117,28 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       valve2 = message.substring(2);
       notifyClients(getValveValues());
     }
-//    if (message.indexOf("getReadings") >= 0) {
-//      String sensorReadings = getSensorReadings();
-//      notifyClients(sensorReadings);      
-//    }
-    // Check if the message is "getReadings"
-    if (strcmp((char*)data, "getReadings") == 0) {  //if it is, send current sensor readings
-      String sensorReadings = getSensorReadings();
-      //Serial.print(sensorReadings);
-      notifyClients(sensorReadings);
+    if (message.indexOf("3b") >= 0) {
+      valve3 = message.substring(2);
+      notifyClients(getValveValues());
     }
+    if (message.indexOf("4b") >= 0) {
+      valve4 = message.substring(2);
+      notifyClients(getValveValues());
+    }
+    if (message.indexOf("5b") >= 0) {
+      valve5 = message.substring(2);
+      notifyClients(getValveValues());
+    }    
+    if (message.indexOf("getReadings") >= 0) {
+      String sensorReadings = getSensorReadings();
+      notifyClients(sensorReadings);      
+    }
+    // Check if the message is "getReadings"
+//    if (strcmp((char*)data, "getReadings") == 0) {  //if it is, send current sensor readings
+//      String sensorReadings = getSensorReadings();
+//      //Serial.print(sensorReadings);
+//      notifyClients(sensorReadings);
+//    }
 //    if (strcmp((char*)data, "getValveValues") == 0) {  //if it is, send current sensor readings
 //      String valveReadings = getValveValues();
 //      //Serial.print(sensorReadings);
