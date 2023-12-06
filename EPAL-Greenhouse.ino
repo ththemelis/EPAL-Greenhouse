@@ -17,17 +17,10 @@
 #include "TickTwo.h"
 
 String getSensorReadings();
+String getValveValues();
 
 TickTwo readingsTimer(getSensorReadings, 15000);  // Δημιουργία αντικειμένου για την λήψη τιμών σε τακτά διαστήματα
 TickTwo valvesTimer(getValveValues, 10000);
-
-String changeValve() {   // Λήψη της κατάστασης των βανών και επιστροφή τους με την μορφή JSON
-  valveValues["valve1"] = String(valve1);
-
-  String jsonString = JSON.stringify(valveValues);
-  Serial.println(jsonString);
-  return jsonString;
-}
 
 bool ledState = 0;
 #define ledPin 2
@@ -49,7 +42,7 @@ void initWiFi() {   // Συνάρτηση ενεργοποίησης και σύ
   Serial.println(WiFi.localIP());
 }
 
-JSONVar readings;   // Μεταβλητή JSON για την αποθήκευση των μετρήσεων
+JSONVar sensorReadings;   // Μεταβλητή JSON για την αποθήκευση των μετρήσεων
 JSONVar valveValues;
 String message = "";
 String valve1 = "0";
@@ -68,14 +61,25 @@ void initBME() {  // Συνάρτηση ενεργοποίησης του αισ
 }
 
 String getSensorReadings() {  // Λήψη τιμών από τους αισθητήρες και επιστροφή τους με την μορφή JSON
-  readings["temperature"] = String(bme.readTempC());
-  readings["air-humidity"] =  String(bme.readFloatHumidity());
-  readings["gnd-humidity"] = String(1);
+  float temp = bme.readTempC();
+  float hum = bme.readFloatHumidity();
+  sensorReadings["temperature"] = String(temp);
+  sensorReadings["air-humidity"] =  String(hum);
+  sensorReadings["gnd-humidity"] = String(1);
 
-  String jsonString = JSON.stringify(readings);
+  String jsonString = JSON.stringify(sensorReadings);
   notifyClients(jsonString);
   Serial.println(jsonString);
-  return jsonString;
+  if (temp>22.00) {
+    valveValues["valve2"] = String(1);
+    String jsonValve = JSON.stringify(valveValues);
+    notifyClients(jsonValve);
+  } else {
+    valveValues["valve2"] = String(0);
+    String jsonValve = JSON.stringify(valveValues);
+    notifyClients(jsonValve);    
+  }
+  return sensorReadings;
 }
 
 String getValveValues() {   // Λήψη της κατάστασης των βανών και επιστροφή τους με την μορφή JSON
@@ -130,8 +134,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       notifyClients(getValveValues());
     }    
     if (message.indexOf("getReadings") >= 0) {
-      String sensorReadings = getSensorReadings();
-      notifyClients(sensorReadings);      
+      notifyClients(getSensorReadings());      
     }
     // Check if the message is "getReadings"
 //    if (strcmp((char*)data, "getReadings") == 0) {  //if it is, send current sensor readings
@@ -198,11 +201,6 @@ void setup() {
 
 void loop() {
   readingsTimer.update();
-  //  if ((millis() - lastTime) > timerDelay) {
-  //    String sensorReadings = getSensorReadings();
-  //    Serial.println(sensorReadings);
-  //    notifyClients(sensorReadings);
-  //    lastTime = millis();
-  //  }
+//  Serial.println (sensorReadings["temperature"]);
   ws.cleanupClients();
 }
