@@ -3,9 +3,7 @@
 //  https://randomnerdtutorials.com/esp32-websocket-server-sensor/
 //  https://m1cr0lab-esp32.github.io/remote-control-with-websocket/web-ui-design/
 
-// Αλλαγή της toggle
-// Αλλαγή των κουμπιών (από τις βάνες) για να λειτουργούν όπως οι sliders
-// Προσθήκη φίλτρου για αφαίρεση μη αποδεκτών τιμών από τους αισθητήρες (moving average?)
+// https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
 
 #include <WiFi.h>
 #include <WiFiMulti.h>
@@ -41,17 +39,10 @@ void initWiFi() {   // Συνάρτηση ενεργοποίησης και σύ
   Serial.print("Διεύθυνση IP: ");
   Serial.println(WiFi.localIP());
 }
-
-JSONVar sensorReadings;   // Μεταβλητή JSON για την αποθήκευση των μετρήσεων
-JSONVar valveValues;
 String message = "";
-String valve1 = "0";
-String valve2 = "0";
-String valve3 = "0";
-String valve4 = "0";
-String valve5 = "0";
 
 BME280 bme;   // Δημιουργία αντικειμένου για τον αισθητήρα BME280
+JSONVar sensorReadings;   // Μεταβλητή JSON για την αποθήκευση των μετρήσεων
 float airTemperature, airHumidity;
 void initBME() {  // Συνάρτηση ενεργοποίησης του αισθητήρα BME280
   Wire.begin();
@@ -67,6 +58,10 @@ void initBME() {  // Συνάρτηση ενεργοποίησης του αισ
   bme.setMode(MODE_NORMAL);
 }
 
+String checkValves() {
+  return "1";
+}
+
 String getSensorReadings() {  // Λήψη τιμών από τους αισθητήρες και επιστροφή τους με την μορφή JSON
   airTemperature = bme.readTempC();
   airHumidity = bme.readFloatHumidity();
@@ -74,9 +69,8 @@ String getSensorReadings() {  // Λήψη τιμών από τους αισθη�
   sensorReadings["airHumidity"] =  String(airHumidity);
   sensorReadings["gndHumidity"] = String(1);
 
-  String jsonString = JSON.stringify(sensorReadings);
-  notifyClients(jsonString);
-  Serial.println(jsonString);
+  notifyClients(JSON.stringify(sensorReadings));
+  Serial.println(sensorReadings);
 //  if (temp>22.00 && valve2=="0") {
 //    valveValues["valve2"] = String(1);
 //    String jsonValve = JSON.stringify(valveValues);
@@ -86,9 +80,15 @@ String getSensorReadings() {  // Λήψη τιμών από τους αισθη�
 //    String jsonValve = JSON.stringify(valveValues);
 //    notifyClients(jsonValve);    
 //  }
-  return sensorReadings;
+  return JSON.stringify(sensorReadings);
 }
 
+JSONVar valveValues;
+bool valve1 = 0;
+bool valve2 = 0;
+bool valve3 = 0;
+bool valve4 = 0;
+bool valve5 = 0;
 String getValveValues() {   // Λήψη της κατάστασης των βανών και επιστροφή τους με την μορφή JSON
   valveValues["valve1"] = String(valve1);
   valveValues["valve2"] = String(valve2);
@@ -96,9 +96,23 @@ String getValveValues() {   // Λήψη της κατάστασης των βα�
   valveValues["valve4"] = String(valve4);
   valveValues["valve5"] = String(valve5);
 
-  String jsonString = JSON.stringify(valveValues);
-  Serial.println(jsonString);
-  return jsonString;
+  Serial.println(JSON.stringify(valveValues));
+  return JSON.stringify(valveValues);
+}
+
+JSONVar sliderValues;
+int airTempLimit_floor=27;
+int airTempLimit_ceil=32;
+int airHumLimit_floor=60;
+int airHumLimit_ceil=90;
+String getSliderValues() {   // Λήψη των ρυθμίσεων και επιστροφή τους με την μορφή JSON
+  sliderValues["airTempLimit_floor"] = String(airTempLimit_floor);
+  sliderValues["airTempLimit_ceil"] = String(airTempLimit_ceil);
+  sliderValues["airHumLimit_floor"] = String(airHumLimit_floor);
+  sliderValues["airHumLimit_ceil"] = String(airHumLimit_ceil);
+
+  Serial.println(JSON.stringify(sliderValues));
+  return JSON.stringify(sliderValues);
 }
 
 void initSPIFFS() {   // Αρχικοποίηση του χώρου αποθήκευσης SPIFFS
@@ -118,30 +132,44 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     data[len] = 0;
     String message = (char*)data;
 
-    if (message.indexOf("1b") >= 0) {
-      valve1 = message.substring(2);
+    if (message.indexOf("1v") >= 0) {
+      valve1=!valve1;
       ledState = !ledState;
       digitalWrite(ledPin, ledState);
       notifyClients(getValveValues());
     }
-    if (message.indexOf("2b") >= 0) {
-      valve2 = message.substring(2);
+    if (message.indexOf("2v") >= 0) {
+      valve2=!valve2;
       notifyClients(getValveValues());
     }
-    if (message.indexOf("3b") >= 0) {
-      valve3 = message.substring(2);
+    if (message.indexOf("3v") >= 0) {
+      valve3=!valve3;
       notifyClients(getValveValues());
     }
-    if (message.indexOf("4b") >= 0) {
-      valve4 = message.substring(2);
+    if (message.indexOf("4v") >= 0) {
+      valve4=!valve4;
       notifyClients(getValveValues());
     }
-    if (message.indexOf("5b") >= 0) {
-      valve5 = message.substring(2);
+    if (message.indexOf("5v") >= 0) {
+      valve5=!valve5;
       notifyClients(getValveValues());
-    }    
+    }
+    if (message.indexOf("1s") >= 0) {
+      airTempLimit_floor = message.substring(2).toInt();
+      Serial.println(airTempLimit_floor);
+    }
+    if (message.indexOf("2s") >= 0) {
+      airTempLimit_ceil = message.substring(2).toInt();
+      Serial.println(airTempLimit_ceil);
+    }  
     if (message.indexOf("getReadings") >= 0) {
       notifyClients(getSensorReadings());      
+    }
+    if (message.indexOf("getValveValues") >= 0) {
+      notifyClients(getValveValues());      
+    }
+    if (message.indexOf("getSliderValues") >= 0) {
+      notifyClients(getSliderValues());      
     }
   }
 }

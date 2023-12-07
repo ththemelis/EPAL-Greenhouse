@@ -35,20 +35,27 @@
     <div class="content">
         <div class="card-grid">
             <div class="card">
-                <p class="card-title">Όριο θερμοκρασίας αέρα</p>
+                <p class="card-title">Κάτω όριο θερμοκρασίας αέρα</p>
                 <p class="switch">
-                    <input type="range" onchange="updateSliderPWM(this)" id="slider1" min="0" max="100" step="1"
-                        value="0" class="slider">
+                    <input type="range" oninput="updateSlider(this)" id="slider1" min="27" max="40" step="1"
+                        value="27" class="slider">
                 </p>
                 <p class="state"><span id="sliderValue1"></span> &deg; C</p>
+
+                <p class="card-title">Άνω όριο θερμοκρασίας αέρα</p>
+                <p class="switch">
+                    <input type="range" oninput="updateSlider(this)" id="slider2" min="27" max="40" step="1"
+                        value="40" class="slider">
+                </p>
+                <p class="state"><span id="sliderValue2"></span> &deg; C</p>                
             </div>
             <div class="card">
-                <p class="card-title">Όριο σχετικής υγρασίας</p>
+                <p class="card-title">Κάτω όριο σχετικής υγρασίας</p>
                 <p class="switch">
-                    <input type="range" onchange="updateSliderPWM(this)" id="slider2" min="0" max="100" step="1"
+                    <input type="range" oninput="updateSlider(this)" id="slider3" min="0" max="100" step="1"
                         value="0" class="slider">
                 </p>
-                <p class="state"><span id="sliderValue2"></span> &percnt;</p>
+                <p class="state"><span id="sliderValue3"></span> &percnt;</p>
             </div>
         </div>
     </div>

@@ -10,16 +10,7 @@ function onload(event) {
 
 function toggle(element){
     var valveNumber = element.id.charAt(element.id.length-1);
-    if (document.getElementById('state'+valveNumber).innerHTML == "Κλειστή"){
-        valveState=1;
-    } else {
-        valveState=0;
-    }
-    websocket.send(valveNumber+"b"+valveState);
-}
-
-function getReadings(){     // Κλήση της συνάρτησης για την λήψη μετρήσεων από τους αισθητήρες
-    websocket.send("getReadings");
+    websocket.send(valveNumber+"v");
 }
 
 function initWebSocket() {
@@ -32,8 +23,9 @@ function initWebSocket() {
 
 function onOpen(event) {    // Η συνάρτηση τρέχει μετά την πραγματοποίηση μιας σύνδεσης
     console.log('Connection opened');
-    getReadings();
+    websocket.send("getReadings");   // Κλήση της συνάρτησης για την λήψη μετρήσεων από τους αισθητήρες
     websocket.send("getValveValues");
+    websocket.send("getSliderValues");
 }
 
 function onClose(event) {   // Η συνάρτηση τρέχει μετά το κλείσιμο μιας σύνδεσης
@@ -41,12 +33,11 @@ function onClose(event) {   // Η συνάρτηση τρέχει μετά το 
     setTimeout(initWebSocket, 2000);
 }
 
-function updateSliderPWM(element) {
+function updateSlider(element) {
     var sliderNumber = element.id.charAt(element.id.length-1);
     var sliderValue = document.getElementById(element.id).value;
     document.getElementById("sliderValue"+sliderNumber).innerHTML = sliderValue;
-    //console.log(sliderValue);
-    websocket.send(sliderNumber+"s"+sliderValue.toString());
+    websocket.send(sliderNumber+"s"+sliderValue);
 }
 
 // Function that receives the message from the ESP32 with the readings
@@ -55,7 +46,7 @@ function onMessage(event) {
     var keys = Object.keys(myObj);
 
     console.log(event.data);
-    if (!isNaN(myObj['airTemperature'])) {
+    if (!isNaN(myObj['airTemperature'])) {  // Αν υπάρχει τιμή στο airTemperature, τότε προβολή της στην ιστοσελίδα
         document.getElementById('airTemperature').innerHTML = myObj["airTemperature"]; }
     if (!isNaN(myObj['airHumidity'])) {
         document.getElementById('airHumidity').innerHTML = myObj['airHumidity']; }
@@ -94,5 +85,13 @@ function onMessage(event) {
         } else {
             document.getElementById('state5').innerHTML = "Κλειστή";
         }
+    }
+    if (myObj['airTempLimit_floor']) {
+        document.getElementById('slider1').value = myObj['airTempLimit_floor'];
+        document.getElementById('sliderValue1').innerHTML = myObj['airTempLimit_floor'];
+    }
+    if (myObj['airTempLimit_ceil']) {
+        document.getElementById('slider2').value = myObj['airTempLimit_ceil'];
+        document.getElementById('sliderValue2').innerHTML = myObj['airTempLimit_ceil'];
     }
 }
