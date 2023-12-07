@@ -55,10 +55,10 @@ function onMessage(event) {
     var keys = Object.keys(myObj);
 
     console.log(event.data);
-    if (!isNaN(myObj['temperature'])) {
-        document.getElementById('temperature').innerHTML = myObj["temperature"]; }
-    if (!isNaN(myObj['air-humidity'])) {
-        document.getElementById('air-humidity').innerHTML = myObj['air-humidity']; }
+    if (!isNaN(myObj['airTemperature'])) {
+        document.getElementById('airTemperature').innerHTML = myObj["airTemperature"]; }
+    if (!isNaN(myObj['airHumidity'])) {
+        document.getElementById('airHumidity').innerHTML = myObj['airHumidity']; }
 
     if (myObj['valve1']) {
         if (myObj['valve1']==1) {

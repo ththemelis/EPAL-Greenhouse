@@ -52,33 +52,40 @@ String valve4 = "0";
 String valve5 = "0";
 
 BME280 bme;   // Δημιουργία αντικειμένου για τον αισθητήρα BME280
+float airTemperature, airHumidity;
 void initBME() {  // Συνάρτηση ενεργοποίησης του αισθητήρα BME280
   Wire.begin();
   if (!bme.beginI2C()) {
     Serial.println("Ο αισθητήρας BME280 δεν βρέθηκε (Έλεγχος της καλωδίωσης)");
     while (1);
   }
+  bme.setFilter(4);
+  bme.setTempOverSample(4);
+  bme.setHumidityOverSample(4);
+  bme.setPressureOverSample(0);
+
+  bme.setMode(MODE_NORMAL);
 }
 
 String getSensorReadings() {  // Λήψη τιμών από τους αισθητήρες και επιστροφή τους με την μορφή JSON
-  float temp = bme.readTempC();
-  float hum = bme.readFloatHumidity();
-  sensorReadings["temperature"] = String(temp);
-  sensorReadings["air-humidity"] =  String(hum);
-  sensorReadings["gnd-humidity"] = String(1);
+  airTemperature = bme.readTempC();
+  airHumidity = bme.readFloatHumidity();
+  sensorReadings["airTemperature"] = String(airTemperature);
+  sensorReadings["airHumidity"] =  String(airHumidity);
+  sensorReadings["gndHumidity"] = String(1);
 
   String jsonString = JSON.stringify(sensorReadings);
   notifyClients(jsonString);
   Serial.println(jsonString);
-  if (temp>22.00) {
-    valveValues["valve2"] = String(1);
-    String jsonValve = JSON.stringify(valveValues);
-    notifyClients(jsonValve);
-  } else {
-    valveValues["valve2"] = String(0);
-    String jsonValve = JSON.stringify(valveValues);
-    notifyClients(jsonValve);    
-  }
+//  if (temp>22.00 && valve2=="0") {
+//    valveValues["valve2"] = String(1);
+//    String jsonValve = JSON.stringify(valveValues);
+//    notifyClients(jsonValve);
+//  } else if (temp<22.00 && valve2=="1") {
+//    valveValues["valve2"] = String(0);
+//    String jsonValve = JSON.stringify(valveValues);
+//    notifyClients(jsonValve);    
+//  }
   return sensorReadings;
 }
 
@@ -136,23 +143,6 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     if (message.indexOf("getReadings") >= 0) {
       notifyClients(getSensorReadings());      
     }
-    // Check if the message is "getReadings"
-//    if (strcmp((char*)data, "getReadings") == 0) {  //if it is, send current sensor readings
-//      String sensorReadings = getSensorReadings();
-//      //Serial.print(sensorReadings);
-//      notifyClients(sensorReadings);
-//    }
-//    if (strcmp((char*)data, "getValveValues") == 0) {  //if it is, send current sensor readings
-//      String valveReadings = getValveValues();
-//      //Serial.print(sensorReadings);
-//      notifyClients(valveReadings);
-//    }
-    //    if (strcmp((char*)data, "toggle") == 0) {
-    //      ledState = !ledState;
-    //      digitalWrite(ledPin, ledState);
-    //      Serial.println(ledState);
-    //      notifyClients(String(ledState));
-    //    }
   }
 }
 
@@ -201,6 +191,5 @@ void setup() {
 
 void loop() {
   readingsTimer.update();
-//  Serial.println (sensorReadings["temperature"]);
   ws.cleanupClients();
 }
