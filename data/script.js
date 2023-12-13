@@ -25,7 +25,7 @@ function onOpen(event) {    // Η συνάρτηση τρέχει μετά τη�
     console.log('Connection opened');
     websocket.send("getReadings");   // Κλήση της συνάρτησης για την λήψη μετρήσεων από τους αισθητήρες
     websocket.send("getValveValues");
-    websocket.send("getSliderValues");
+    websocket.send("getLimitValues");
 }
 
 function onClose(event) {   // Η συνάρτηση τρέχει μετά το κλείσιμο μιας σύνδεσης
@@ -33,11 +33,15 @@ function onClose(event) {   // Η συνάρτηση τρέχει μετά το 
     setTimeout(initWebSocket, 2000);
 }
 
-function updateSlider(element) {
-    var sliderNumber = element.id.charAt(element.id.length-1);
-    var sliderValue = document.getElementById(element.id).value;
-    document.getElementById("sliderValue"+sliderNumber).innerHTML = sliderValue;
-    websocket.send(sliderNumber+"s"+sliderValue);
+function updateLimit(element) {
+    var limitNumber = element.id.charAt(element.id.length-1);
+    var limitVal=document.getElementById(element.id).value;
+    if (limitNumber == 1 && limitVal<27) {
+        document.getElementById(element.id).value=27;
+        limitVal=27;
+    }
+    // console.log(limitNumber+"l"+limitVal);
+    websocket.send(limitNumber+"l"+limitVal);
 }
 
 // Function that receives the message from the ESP32 with the readings
@@ -87,11 +91,23 @@ function onMessage(event) {
         }
     }
     if (myObj['airTempLimit_floor']) {
-        document.getElementById('slider1').value = myObj['airTempLimit_floor'];
-        document.getElementById('sliderValue1').innerHTML = myObj['airTempLimit_floor'];
+        document.getElementById('limit1').value = myObj['airTempLimit_floor'];
+        // document.getElementById('sliderValue1').innerHTML = myObj['airTempLimit_floor'];
     }
     if (myObj['airTempLimit_ceil']) {
-        document.getElementById('slider2').value = myObj['airTempLimit_ceil'];
-        document.getElementById('sliderValue2').innerHTML = myObj['airTempLimit_ceil'];
+        document.getElementById('limit2').value = myObj['airTempLimit_ceil'];
+    }
+    if (myObj['airHumLimit_floor']) {
+        document.getElementById('limit3').value = myObj['airHumLimit_floor'];
+    }
+    if (myObj['airHumLimit_ceil']) {
+        document.getElementById('limit4').value = myObj['airHumLimit_ceil'];
+    }
+    if (myObj['gndHumLimit_floor']) {
+        document.getElementById('limit5').value = myObj['gndHumLimit_floor'];
+    }
+    if (myObj['gndHumLimit_ceil']) {
+        document.getElementById('limit6').value = myObj['gndHumLimit_ceil'];
     }
 }
+

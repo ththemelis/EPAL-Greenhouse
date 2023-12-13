@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="script.js"></script>
 </head>
 
 <body>
@@ -20,45 +19,80 @@
             <div class="card">
                 <p class="card-title">Θερμοκρασία</p>
                 <p class="reading"><span id="airTemperature"></span> &deg;C</p>
+                <p class="card-title">Κάτω όριο</p>
+                <p class="switch">
+                    <input type="number" onchange="updateLimit(this)" id="limit1" step="0.5">
+                </p>
+                <p class="card-title">Άνω όριο</p>
+                <p class="switch">
+                    <input type="number" onchange="updateLimit(this)" id="limit2" step="0.5">
+                </p>
             </div>
             <div class="card">
                 <p class="card-title">Σχετική υγρασία</p>
                 <p class="reading"><span id="airHumidity"></span> &percnt;</p>
+                <p class="card-title">Κάτω όριο</p>
+                <p class="switch">
+                    <input type="number" onchange="updateLimit(this)" id="limit3" min="0" max="100">
+                </p>
+                <p class="card-title">Άνω όριο</p>
+                <p class="switch">
+                    <input type="number" onchange="updateLimit(this)" id="limit4" min="0" max="100">
+                </p>
             </div>
             <div class="card">
                 <p class="card-title">Υγρασία εδάφους</p>
                 <p class="reading"><span id="gndHumidity"></span> &percnt;</p>
+                <p class="card-title">Κάτω όριο</p>
+                <p class="switch">
+                    <input type="number" onchange="updateLimit(this)" id="limit5" min="0" max="100">
+                </p>
+                <p class="card-title">Άνω όριο</p>
+                <p class="switch">
+                    <input type="number" onchange="updateLimit(this)" id="limit6" min="0" max="100">
+                </p>
             </div>
         </div>
     </div>
 
-    <div class="content">
+    <!-- <div class="content">
         <div class="card-grid">
             <div class="card">
-                <p class="card-title">Κάτω όριο θερμοκρασίας αέρα</p>
+                <p class="card-title">Θερμοκρασία αέρα</p>
+                <p class="card-title">Κάτω όριο</p>
                 <p class="switch">
-                    <input type="range" oninput="updateSlider(this)" id="slider1" min="27" max="40" step="1"
-                        value="27" class="slider">
+                    <input type="number" onchange="updateLimit(this)" id="limit1" step="0.5">
                 </p>
-                <p class="state"><span id="sliderValue1"></span> &deg; C</p>
-
-                <p class="card-title">Άνω όριο θερμοκρασίας αέρα</p>
+                <p class="card-title">Άνω όριο</p>
                 <p class="switch">
-                    <input type="range" oninput="updateSlider(this)" id="slider2" min="27" max="40" step="1"
-                        value="40" class="slider">
+                    <input type="number" onchange="updateLimit(this)" id="limit2" step="0.5">
                 </p>
                 <p class="state"><span id="sliderValue2"></span> &deg; C</p>                
             </div>
             <div class="card">
-                <p class="card-title">Κάτω όριο σχετικής υγρασίας</p>
+                <p class="card-title">Σχετική υγρασία</p>
+                <p class="card-title">Κάτω όριο</p>
                 <p class="switch">
-                    <input type="range" oninput="updateSlider(this)" id="slider3" min="0" max="100" step="1"
-                        value="0" class="slider">
+                    <input type="number" onchange="updateLimit(this)" id="limit3">
                 </p>
-                <p class="state"><span id="sliderValue3"></span> &percnt;</p>
+                <p class="card-title">Άνω όριο</p>
+                <p class="switch">
+                    <input type="number" onchange="updateLimit(this)" id="limit4">
+                </p>
+            </div>
+            <div class="card">
+                <p class="card-title">Υγρασία εδάφους</p>
+                <p class="card-title">Κάτω όριο</p>
+                <p class="switch">
+                    <input type="number" onchange="updateLimit(this)" id="limit5">
+                </p>
+                <p class="card-title">Άνω όριο</p>
+                <p class="switch">
+                    <input type="number" onchange="updateLimit(this)" id="limit6">
+                </p>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="content">
         <div class="card-grid">
@@ -89,6 +123,7 @@
             </div>
         </div>
     </div>
+    <script src="script.js"></script>
 </body>
 
 </html>

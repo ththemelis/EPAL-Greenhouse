@@ -2,7 +2,6 @@
 //  https://randomnerdtutorials.com/esp32-websocket-server-arduino/
 //  https://randomnerdtutorials.com/esp32-websocket-server-sensor/
 //  https://m1cr0lab-esp32.github.io/remote-control-with-websocket/web-ui-design/
-
 // https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
 
 #include <WiFi.h>
@@ -100,19 +99,23 @@ String getValveValues() {   // Λήψη της κατάστασης των βα�
   return JSON.stringify(valveValues);
 }
 
-JSONVar sliderValues;
-int airTempLimit_floor=27;
-int airTempLimit_ceil=32;
+JSONVar limitValues;
+float airTempLimit_floor=27.0;
+float airTempLimit_ceil=32.0;
 int airHumLimit_floor=60;
 int airHumLimit_ceil=90;
-String getSliderValues() {   // Λήψη των ρυθμίσεων και επιστροφή τους με την μορφή JSON
-  sliderValues["airTempLimit_floor"] = String(airTempLimit_floor);
-  sliderValues["airTempLimit_ceil"] = String(airTempLimit_ceil);
-  sliderValues["airHumLimit_floor"] = String(airHumLimit_floor);
-  sliderValues["airHumLimit_ceil"] = String(airHumLimit_ceil);
+int gndHumLimit_floor=60;
+int gndHumLimit_ceil=90;
+String getLimitValues() {   // Λήψη των ρυθμίσεων και επιστροφή τους με την μορφή JSON
+  limitValues["airTempLimit_floor"] = String(airTempLimit_floor);
+  limitValues["airTempLimit_ceil"] = String(airTempLimit_ceil);
+  limitValues["airHumLimit_floor"] = String(airHumLimit_floor);
+  limitValues["airHumLimit_ceil"] = String(airHumLimit_ceil);
+  limitValues["gndHumLimit_floor"] = String(gndHumLimit_floor);
+  limitValues["gndHumLimit_ceil"] = String(gndHumLimit_ceil);
 
-  Serial.println(JSON.stringify(sliderValues));
-  return JSON.stringify(sliderValues);
+  Serial.println(JSON.stringify(limitValues));
+  return JSON.stringify(limitValues);
 }
 
 void initSPIFFS() {   // Αρχικοποίηση του χώρου αποθήκευσης SPIFFS
@@ -154,22 +157,38 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       valve5=!valve5;
       notifyClients(getValveValues());
     }
-    if (message.indexOf("1s") >= 0) {
-      airTempLimit_floor = message.substring(2).toInt();
-      Serial.println(airTempLimit_floor);
+    if (message.indexOf("1l") >= 0) {
+      airTempLimit_floor = message.substring(2).toFloat();
+      notifyClients(getLimitValues());
     }
-    if (message.indexOf("2s") >= 0) {
-      airTempLimit_ceil = message.substring(2).toInt();
-      Serial.println(airTempLimit_ceil);
+    if (message.indexOf("2l") >= 0) {
+      airTempLimit_ceil = message.substring(2).toFloat();
+      notifyClients(getLimitValues());
     }  
+    if (message.indexOf("3l") >= 0) {
+      airHumLimit_floor = message.substring(2).toFloat();
+      notifyClients(getLimitValues());
+    }
+    if (message.indexOf("4l") >= 0) {
+      airHumLimit_ceil = message.substring(2).toFloat();
+      notifyClients(getLimitValues());
+    }  
+    if (message.indexOf("5l") >= 0) {
+      gndHumLimit_floor = message.substring(2).toFloat();
+      notifyClients(getLimitValues());
+    } 
+    if (message.indexOf("6l") >= 0) {
+      gndHumLimit_ceil = message.substring(2).toFloat();
+      notifyClients(getLimitValues());
+    } 
     if (message.indexOf("getReadings") >= 0) {
       notifyClients(getSensorReadings());      
     }
     if (message.indexOf("getValveValues") >= 0) {
       notifyClients(getValveValues());      
     }
-    if (message.indexOf("getSliderValues") >= 0) {
-      notifyClients(getSliderValues());      
+    if (message.indexOf("getLimitValues") >= 0) {
+      notifyClients(getLimitValues());      
     }
   }
 }
