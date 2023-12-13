@@ -13,6 +13,10 @@ function toggle(element){
     websocket.send(valveNumber+"v");
 }
 
+function toggleOp(){
+    websocket.send(1+"o");
+}
+
 function initWebSocket() {
     console.log('Trying to open a WebSocket connection…');
     websocket = new WebSocket(gateway);
@@ -36,10 +40,10 @@ function onClose(event) {   // Η συνάρτηση τρέχει μετά το 
 function updateLimit(element) {
     var limitNumber = element.id.charAt(element.id.length-1);
     var limitVal=document.getElementById(element.id).value;
-    if (limitNumber == 1 && limitVal<27) {
-        document.getElementById(element.id).value=27;
-        limitVal=27;
-    }
+    // if (limitNumber == 1 && limitVal<27) {
+    //     document.getElementById(element.id).value=27;
+    //     limitVal=27;
+    // }
     // console.log(limitNumber+"l"+limitVal);
     websocket.send(limitNumber+"l"+limitVal);
 }
@@ -50,6 +54,15 @@ function onMessage(event) {
     var keys = Object.keys(myObj);
 
     console.log(event.data);
+
+    if (myObj['operation']) {
+        if (myObj['operation']==1) {
+            document.getElementById('operation').innerHTML = "Αυτόματη λειτουργία";
+        } else {
+            document.getElementById('operation').innerHTML = "Χειροκίνητη λειτουργία";
+        }
+    }
+
     if (!isNaN(myObj['airTemperature'])) {  // Αν υπάρχει τιμή στο airTemperature, τότε προβολή της στην ιστοσελίδα
         document.getElementById('airTemperature').innerHTML = myObj["airTemperature"]; }
     if (!isNaN(myObj['airHumidity'])) {

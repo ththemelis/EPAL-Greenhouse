@@ -14,10 +14,10 @@
 #include "TickTwo.h"
 
 String getSensorReadings();
-String getValveValues();
+void checkValves();
 
 TickTwo readingsTimer(getSensorReadings, 15000);  // Δημιουργία αντικειμένου για την λήψη τιμών σε τακτά διαστήματα
-TickTwo valvesTimer(getValveValues, 10000);
+TickTwo valvesTimer(checkValves, 15000);    // // Δημιουργία αντικειμένου για έλεγχο των βανών σε τακτά διαστήματα
 
 bool ledState = 0;
 #define ledPin 2
@@ -38,11 +38,9 @@ void initWiFi() {   // Συνάρτηση ενεργοποίησης και σύ
   Serial.print("Διεύθυνση IP: ");
   Serial.println(WiFi.localIP());
 }
-String message = "";
+//String message = "";
 
 BME280 bme;   // Δημιουργία αντικειμένου για τον αισθητήρα BME280
-JSONVar sensorReadings;   // Μεταβλητή JSON για την αποθήκευση των μετρήσεων
-float airTemperature, airHumidity;
 void initBME() {  // Συνάρτηση ενεργοποίησης του αισθητήρα BME280
   Wire.begin();
   if (!bme.beginI2C()) {
@@ -57,10 +55,8 @@ void initBME() {  // Συνάρτηση ενεργοποίησης του αισ
   bme.setMode(MODE_NORMAL);
 }
 
-String checkValves() {
-  return "1";
-}
-
+float airTemperature, airHumidity;
+JSONVar sensorReadings;   // Μεταβλητή JSON για την αποθήκευση των μετρήσεων
 String getSensorReadings() {  // Λήψη τιμών από τους αισθητήρες και επιστροφή τους με την μορφή JSON
   airTemperature = bme.readTempC();
   airHumidity = bme.readFloatHumidity();
@@ -70,16 +66,26 @@ String getSensorReadings() {  // Λήψη τιμών από τους αισθη�
 
   notifyClients(JSON.stringify(sensorReadings));
   Serial.println(sensorReadings);
-//  if (temp>22.00 && valve2=="0") {
-//    valveValues["valve2"] = String(1);
-//    String jsonValve = JSON.stringify(valveValues);
-//    notifyClients(jsonValve);
-//  } else if (temp<22.00 && valve2=="1") {
-//    valveValues["valve2"] = String(0);
-//    String jsonValve = JSON.stringify(valveValues);
-//    notifyClients(jsonValve);    
-//  }
   return JSON.stringify(sensorReadings);
+}
+
+JSONVar limitValues;
+float airTempLimit_floor=22.0;
+float airTempLimit_ceil=32.0;
+int airHumLimit_floor=60;
+int airHumLimit_ceil=90;
+int gndHumLimit_floor=60;
+int gndHumLimit_ceil=90;
+String getLimitValues() {   // Λήψη των ρυθμίσεων και επιστροφή τους με την μορφή JSON
+  limitValues["airTempLimit_floor"] = String(airTempLimit_floor);
+  limitValues["airTempLimit_ceil"] = String(airTempLimit_ceil);
+  limitValues["airHumLimit_floor"] = String(airHumLimit_floor);
+  limitValues["airHumLimit_ceil"] = String(airHumLimit_ceil);
+  limitValues["gndHumLimit_floor"] = String(gndHumLimit_floor);
+  limitValues["gndHumLimit_ceil"] = String(gndHumLimit_ceil);
+
+  Serial.println(JSON.stringify(limitValues));
+  return JSON.stringify(limitValues);
 }
 
 JSONVar valveValues;
@@ -99,23 +105,38 @@ String getValveValues() {   // Λήψη της κατάστασης των βα�
   return JSON.stringify(valveValues);
 }
 
-JSONVar limitValues;
-float airTempLimit_floor=27.0;
-float airTempLimit_ceil=32.0;
-int airHumLimit_floor=60;
-int airHumLimit_ceil=90;
-int gndHumLimit_floor=60;
-int gndHumLimit_ceil=90;
-String getLimitValues() {   // Λήψη των ρυθμίσεων και επιστροφή τους με την μορφή JSON
-  limitValues["airTempLimit_floor"] = String(airTempLimit_floor);
-  limitValues["airTempLimit_ceil"] = String(airTempLimit_ceil);
-  limitValues["airHumLimit_floor"] = String(airHumLimit_floor);
-  limitValues["airHumLimit_ceil"] = String(airHumLimit_ceil);
-  limitValues["gndHumLimit_floor"] = String(gndHumLimit_floor);
-  limitValues["gndHumLimit_ceil"] = String(gndHumLimit_ceil);
+JSONVar operationValue;
+bool operation = 0;   // Χειροκίνητος τρόπος λειτουργίας
+String getOperationValue() {   // Λήψη της κατάστασης των βανών και επιστροφή τους με την μορφή JSON
+  operationValue["operation"] = String(operation);
 
-  Serial.println(JSON.stringify(limitValues));
-  return JSON.stringify(limitValues);
+  Serial.println(JSON.stringify(operationValue));
+  return JSON.stringify(operationValue);
+}
+
+void openAllValves() {  // Ενεργοποίηση όλων των βανών
+  ledState = 1;
+  valve1 = 1;
+  digitalWrite (ledPin, 1);  
+}
+
+void closeAllValves() { // Απενεργοποίηση όλων των βανών
+  ledState = 0;
+  valve1 = 0;
+  digitalWrite (ledPin, 0);
+}
+
+void checkValves() {  // Έλεγχος των βανών ανάλογα με τις τιμές των αισθητήρων και των ορίων που έχουμε θέσει
+  if (airTempLimit_floor > airTemperature && operation) {
+    openAllValves();
+  } else {
+    closeAllValves();
+  }
+  notifyClients(getValveValues());
+}
+
+void notifyClients(String readings) {   // Ενημέρωση των client για αλλαγές στην ιστοσελίδα
+  ws.textAll(readings);
 }
 
 void initSPIFFS() {   // Αρχικοποίηση του χώρου αποθήκευσης SPIFFS
@@ -125,16 +146,16 @@ void initSPIFFS() {   // Αρχικοποίηση του χώρου αποθήκ
   Serial.println("Το SPIFFS προσαρτήθηκε με επιτυχία");
 }
 
-void notifyClients(String readings) {
-  ws.textAll(readings);
-}
-
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
     String message = (char*)data;
 
+    if (message.indexOf("1o") >= 0) {
+      operation=!operation;
+      notifyClients(getOperationValue());
+    }
     if (message.indexOf("1v") >= 0) {
       valve1=!valve1;
       ledState = !ledState;
@@ -218,6 +239,10 @@ void initWebSocket() {
 void setup() {
   Serial.begin(115200);
   pinMode(ledPin, OUTPUT);
+  pinMode(valve2, OUTPUT);
+  pinMode(valve3, OUTPUT);
+  pinMode(valve4, OUTPUT);
+  pinMode(valve5, OUTPUT);
   digitalWrite(ledPin, 0);
   setCpuFrequencyMhz(80);
   initBME();
@@ -234,9 +259,11 @@ void setup() {
 
   server.begin();   // Start server
   readingsTimer.start();
+  valvesTimer.start();
 }
 
 void loop() {
   readingsTimer.update();
+  valvesTimer.update();
   ws.cleanupClients();
 }

@@ -14,16 +14,26 @@
         <h1>ΕΠΑΛ Καστοριάς - Greenhouse Panel</h1>
     </div>
 
+    <div class="div content">
+        <div class="card-grid">
+            <div class="card">
+                <p class="card-title">Τρόπος λειτουργίας</p>
+                <p class="state"><span id="operation">Χειροκίνητη λειτουργία</span></p>
+                <p><button id="valve5" class="button" onclick="toggleOp()">Αλλαγή</button></p>
+            </div>
+        </div>
+    </div>
+
     <div class="content">
         <div class="card-grid">
             <div class="card">
                 <p class="card-title">Θερμοκρασία</p>
                 <p class="reading"><span id="airTemperature"></span> &deg;C</p>
-                <p class="card-title">Κάτω όριο</p>
+                <p class="card-subtitle">Κάτω όριο</p>
                 <p class="switch">
                     <input type="number" onchange="updateLimit(this)" id="limit1" step="0.5">
                 </p>
-                <p class="card-title">Άνω όριο</p>
+                <p class="card-subtitle">Άνω όριο</p>
                 <p class="switch">
                     <input type="number" onchange="updateLimit(this)" id="limit2" step="0.5">
                 </p>

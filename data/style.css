@@ -15,33 +15,38 @@ body {
     margin: 0;
 }
 .content {
-    padding: 15px;
+    padding: 10px;
     margin-bottom: 15px;
 }
 .card-grid {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     display: grid;
-    grid-gap: 2rem;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 .card {
     background-color: white;
     border: 2px solid #000;
     border-radius: 20px;
-    /* box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); */
 }
 .card-title {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     font-weight: bold;
-    color: #034078
+    color: #03549f
+}
+.card-subtitle{
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #03549f
 }
 .reading {
-    font-size: 1.2rem;
-    color: #1282A2;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #19a212;
 }
 .button {
-    padding: 15px 10px;
+    padding: 5px 5px;
     font-size: 20px;
     text-align: center;
     outline: none;
