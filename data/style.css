@@ -72,3 +72,6 @@ body {
      color:#8c8c8c;
      font-weight: bold;
 }
+input[type=number] {
+    font-size: 1.3rem;
+}
