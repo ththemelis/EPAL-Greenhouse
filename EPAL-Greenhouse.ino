@@ -202,6 +202,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       gndHumLimit_ceil = message.substring(2).toFloat();
       notifyClients(getLimitValues());
     } 
+    if (message.indexOf("getOperationValue") >= 0) {
+      notifyClients(getOperationValue());      
+    }
     if (message.indexOf("getReadings") >= 0) {
       notifyClients(getSensorReadings());      
     }

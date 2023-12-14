@@ -30,6 +30,7 @@ function onOpen(event) {    // Η συνάρτηση τρέχει μετά τη�
     websocket.send("getReadings");   // Κλήση της συνάρτησης για την λήψη μετρήσεων από τους αισθητήρες
     websocket.send("getValveValues");
     websocket.send("getLimitValues");
+    websocket.send("getOperationValue");
 }
 
 function onClose(event) {   // Η συνάρτηση τρέχει μετά το κλείσιμο μιας σύνδεσης
@@ -57,9 +58,11 @@ function onMessage(event) {
 
     if (myObj['operation']) {
         if (myObj['operation']==1) {
-            document.getElementById('operation').innerHTML = "Αυτόματη λειτουργία";
+            document.getElementById("operation").checked = true;
+            document.getElementById('operationLabel').innerHTML = "Αυτόματη λειτουργία";
         } else {
-            document.getElementById('operation').innerHTML = "Χειροκίνητη λειτουργία";
+            document.getElementById("operation").checked = false;
+            document.getElementById('operationLabel').innerHTML = "Χειροκίνητη λειτουργία";
         }
     }
 

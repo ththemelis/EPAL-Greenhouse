@@ -18,6 +18,10 @@ body {
     padding: 10px;
     margin-bottom: 15px;
 }
+.oper {
+    max-width: 450px;
+    margin: 0 auto;
+}
 .card-grid {
     max-width: 900px;
     margin: 0 auto;
