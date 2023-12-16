@@ -79,3 +79,14 @@ body {
 input[type=number] {
     font-size: 1.3rem;
 }
+.circle {
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    padding: 10px;
+    background: #fff;
+    border: 3px solid #000;
+    color: #000;
+    text-align: center;
+    font: 32px Arial, sans-serif;
+}

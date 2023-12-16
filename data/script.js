@@ -60,9 +60,15 @@ function onMessage(event) {
         if (myObj['operation']==1) {
             document.getElementById("operation").checked = true;
             document.getElementById('operationLabel').innerHTML = "Αυτόματη λειτουργία";
+            for (let i=1; i <= 5; i++){
+                document.getElementById("valve" + i).disabled = true;
+            }
         } else {
             document.getElementById("operation").checked = false;
             document.getElementById('operationLabel').innerHTML = "Χειροκίνητη λειτουργία";
+            for (let i=1; i <= 5; i++){
+                document.getElementById("valve" + i).disabled = false;
+            }
         }
     }
 
@@ -73,42 +79,58 @@ function onMessage(event) {
 
     if (myObj['valve1']) {
         if (myObj['valve1']==1) {
-            document.getElementById('state1').innerHTML = "Ανοιχτή";
+            document.getElementById('valve1').innerHTML = "On";
+            document.getElementById("valve1").setAttribute('class', 'btn btn-success');
+            document.getElementById("state1").setAttribute('class', 'bi bi-1-circle-fill')
         } else {
-            document.getElementById('state1').innerHTML = "Κλειστή";
+            document.getElementById('valve1').innerHTML = "Off";
+            document.getElementById("valve1").setAttribute('class', 'btn btn-danger');
+            document.getElementById("state1").setAttribute('class', 'bi bi-1-circle')
         }
     }
     if (myObj['valve2']) {
         if (myObj['valve2']==1) {
-            document.getElementById('state2').innerHTML = "Ανοιχτή";
+            document.getElementById('valve2').innerHTML = "On";
+            document.getElementById("valve2").setAttribute('class', 'btn btn-success');
+            document.getElementById("state2").setAttribute('class', 'bi bi-2-circle-fill')
         } else {
-            document.getElementById('state2').innerHTML = "Κλειστή";
+            document.getElementById('valve2').innerHTML = "Off";
+            document.getElementById("valve2").setAttribute('class', 'btn btn-danger');
+            document.getElementById("state2").setAttribute('class', 'bi bi-2-circle')
         }
     }
     if (myObj['valve3']) {
         if (myObj['valve3']==1) {
-            document.getElementById('state3').innerHTML = "Ανοιχτή";
+            document.getElementById('valve3').innerHTML = "On";
+            document.getElementById("valve3").setAttribute('class', 'btn btn-success');
+            document.getElementById("state3").setAttribute('class', 'bi bi-3-circle-fill')
         } else {
-            document.getElementById('state3').innerHTML = "Κλειστή";
-        }
+            document.getElementById('valve3').innerHTML = "Off";
+            document.getElementById("valve3").setAttribute('class', 'btn btn-danger');
+            document.getElementById("state3").setAttribute('class', 'bi bi-3-circle')        }
     }
     if (myObj['valve4']) {
         if (myObj['valve4']==1) {
-            document.getElementById('state4').innerHTML = "Ανοιχτή";
+            document.getElementById('valve4').innerHTML = "On";
+            document.getElementById("valve4").setAttribute('class', 'btn btn-success');
+            document.getElementById("state4").setAttribute('class', 'bi bi-4-circle-fill')
         } else {
-            document.getElementById('state4').innerHTML = "Κλειστή";
-        }
+            document.getElementById('valve4').innerHTML = "Off";
+            document.getElementById("valve4").setAttribute('class', 'btn btn-danger');
+            document.getElementById("state4").setAttribute('class', 'bi bi-4-circle')        }
     }
     if (myObj['valve5']) {
         if (myObj['valve5']==1) {
-            document.getElementById('state5').innerHTML = "Ανοιχτή";
+            document.getElementById('valve5').innerHTML = "On";
+            document.getElementById("valve5").setAttribute('class', 'btn btn-success');
+            document.getElementById("state5").setAttribute('class', 'bi bi-5-circle-fill')
         } else {
-            document.getElementById('state5').innerHTML = "Κλειστή";
-        }
+            document.getElementById('valve5').innerHTML = "Off";
+            document.getElementById("valve5").setAttribute('class', 'btn btn-danger');
+            document.getElementById("state5").setAttribute('class', 'bi bi-5-circle')        }
     }
     if (myObj['airTempLimit_floor']) {
         document.getElementById('limit1').value = myObj['airTempLimit_floor'];
-        // document.getElementById('sliderValue1').innerHTML = myObj['airTempLimit_floor'];
     }
     if (myObj['airTempLimit_ceil']) {
         document.getElementById('limit2').value = myObj['airTempLimit_ceil'];

@@ -2,7 +2,8 @@
 //  https://randomnerdtutorials.com/esp32-websocket-server-arduino/
 //  https://randomnerdtutorials.com/esp32-websocket-server-sensor/
 //  https://m1cr0lab-esp32.github.io/remote-control-with-websocket/web-ui-design/
-// https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
+//  https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
+//  https://palcarazm.github.io/bootstrap5-toggle/
 
 #include <WiFi.h>
 #include <WiFiMulti.h>
@@ -106,7 +107,7 @@ String getValveValues() {   // Λήψη της κατάστασης των βα�
 }
 
 JSONVar operationValue;
-bool operation = 0;   // Χειροκίνητος τρόπος λειτουργίας
+bool operation = 1;   // 1=Αυτόματο, 0=Χειροκίνητο
 String getOperationValue() {   // Λήψη της κατάστασης των βανών και επιστροφή τους με την μορφή JSON
   operationValue["operation"] = String(operation);
 

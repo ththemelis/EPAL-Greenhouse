@@ -2,142 +2,156 @@
 <html lang="el">
 
 <head>
-    <title>ΕΠΑΛ Καστοριάς - Greenhouse Panel</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ΕΠΑΛ Καστοριάς - Έλεγχος θερμοκηπίου</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="topnav">
-        <h1>ΕΠΑΛ Καστοριάς - Greenhouse Panel</h1>
+  <!-- Επικεφαλίδα -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 my-1 py-2 align-middle bg-success">
+        <h1 class="text-center pt-2">Έλεγχος Θερμοκηπίου</h1>
+      </div>
     </div>
-    <!-- <div class="content"> -->
-            <div class="oper border border-2 border-danger rounded my-2">
-                 <div class="form-switch">
-                    <input class="form-check-input mx-3 bg-danger" style="width: 60px;height: 30px" type="checkbox" role="switch" id="operation" onclick="toggleOp()"/>
-                    <p class="mx-2 h2 text-danger" id="operationLabel">Χειροκίνητη λειτουργία</p>
-                    <!-- <label class="form-check-label mx-2 h2 text-danger" for="operation" id="operationLabel">Χειροκίνητη λειτουργία</label> -->
-                </div>
-            </div>
-        <!-- </div> -->
-    <!-- </div> -->
+  </div>
 
-    <div class="content">
-        <div class="card-grid">
-            <div class="card">
-                <p class="card-title"><i class="bi bi-thermometer"> Θερμοκρασία</i></p>
-                <p class="reading"><span id="airTemperature"></span> &deg;C</p>
-                <p class="card-subtitle">Κάτω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit1" step="0.5">
-                </p>
-                <p class="card-subtitle">Άνω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit2" step="0.5">
-                </p>
+  <div class="container">
+    <div class="row my-2 text-center">
+      <!-- Τρόπος λειτουργίας της συσκευής -->
+      <div class="col-md-2">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Λειτουργία</h4>
+            <div class="form-check form-switch" style="--bs-form-switch-width: 50px; --bs-form-switch-height: 30px">
+              <input class="form-check-input" type="checkbox" role="switch" id="operation" onclick="toggleOp()" />
+              <label class="form-check-label px-3 py-1" for="operation" id="operationLabel">Χειροκίνητη</label>
             </div>
-            <div class="card">
-                <p class="card-title"><i class="bi bi-water"> Σχετική υγρασία</i></p>
-                <p class="reading"><span id="airHumidity"></span> &percnt;</p>
-                <p class="card-title">Κάτω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit3" min="0" max="100">
-                </p>
-                <p class="card-title">Άνω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit4" min="0" max="100">
-                </p>
-            </div>
-            <div class="card">
-                <p class="card-title"><i class="bi bi-rainbow"> Υγρασία εδάφους</i></p>
-                <p class="reading"><span id="gndHumidity"></span> &percnt;</p>
-                <p class="card-title">Κάτω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit5" min="0" max="100">
-                </p>
-                <p class="card-title">Άνω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit6" min="0" max="100">
-                </p>
-            </div>
+          </div>
         </div>
+      </div>
+      <!-- Κατάσταση βανών -->
+      <div class="col-md-2">
+        <div class="card">
+          <div class="card-body">
+            <!-- <h4 class="card-title">Βάνα</h4> -->
+            <h2><i id="state1" class="bi bi-1-circle"></i></h2>
+            <button class="btn btn-danger" id="valve1" onclick="toggle(this)">Off</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card">
+          <div class="card-body">
+            <!-- <h4 class="card-title">Βάνα</h4> -->
+            <h2><i id="state2" class="bi bi-2-circle"></i></h2>
+            <button class="btn btn-danger" id="valve2" onclick="toggle(this)">Off</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card">
+          <div class="card-body">
+            <!-- <h4 class="card-title">Βάνα</h4> -->
+            <h2><i id="state3" class="bi bi-3-circle"></i></h2>
+            <button class="btn btn-danger" id="valve3" onclick="toggle(this)">Off</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card">
+          <div class="card-body">
+            <!-- <h4 class="card-title">Βάνα</h4> -->
+            <h2><i id="state4" class="bi bi-4-circle"></i></h2>
+            <button class="btn btn-danger" id="valve4" onclick="toggle(this)">Off</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="card">
+          <div class="card-body">
+            <!-- <h4 class="card-title">Βάνα</h4> -->
+            <h2><i id="state5" class="bi bi-5-circle"></i></h2>
+            <button class="btn btn-danger" id="valve5" onclick="toggle(this)">Off</button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- <div class="content">
-        <div class="card-grid">
-            <div class="card">
-                <p class="card-title">Θερμοκρασία αέρα</p>
-                <p class="card-title">Κάτω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit1" step="0.5">
-                </p>
-                <p class="card-title">Άνω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit2" step="0.5">
-                </p>
-                <p class="state"><span id="sliderValue2"></span> &deg; C</p>                
-            </div>
-            <div class="card">
-                <p class="card-title">Σχετική υγρασία</p>
-                <p class="card-title">Κάτω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit3">
-                </p>
-                <p class="card-title">Άνω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit4">
-                </p>
-            </div>
-            <div class="card">
-                <p class="card-title">Υγρασία εδάφους</p>
-                <p class="card-title">Κάτω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit5">
-                </p>
-                <p class="card-title">Άνω όριο</p>
-                <p class="switch">
-                    <input type="number" onchange="updateLimit(this)" id="limit6">
-                </p>
-            </div>
+  <!-- Μετρήσεις -->
+  <div class="row text-center">
+    <div class="col-md-4">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi bi-thermometer"></i> Θερμοκρασία αέρα</h5>
+          <p class="card-text">
+          <h3><span id="airTemperature"></span> &deg;C</h3>
+          </p>
+          <p>Κάτω όριο</p>
+          <p class="switch">
+            <input type="number" onchange="updateLimit(this)" id="limit1" step="0.5" />
+          </p>
+          <p>Άνω όριο</p>
+          <p class="switch">
+            <input type="number" onchange="updateLimit(this)" id="limit2" step="0.5" />
+          </p>
         </div>
-    </div> -->
-
-    <div class="content">
-        <div class="card-grid">
-            <div class="card">
-                <p class="card-title">Βάνα 1</p>
-                <p class="state"><span id="state1">Κλειστή</span></p>
-                <p><button id="valve1" class="button" onclick="toggle(this)">Αλλαγή</button></p>
-            </div>
-            <div class="card">
-                <p class="card-title">Βάνα 2</p>
-                <p class="state"><span id="state2">Κλειστή</span></p>
-                <p><button id="valve2" class="button" onclick="toggle(this)">Αλλαγή</button></p>
-            </div>
-            <div class="card">
-                <p class="card-title">Βάνα 3</p>
-                <p class="state"><span id="state3">Κλειστή</span></p>
-                <p><button id="valve3" class="button" onclick="toggle(this)">Αλλαγή</button></p>
-            </div>
-            <div class="card">
-                <p class="card-title">Βάνα 4</p>
-                <p class="state"><span id="state4">Κλειστή</span></p>
-                <p><button id="valve4" class="button" onclick="toggle(this)">Αλλαγή</button></p>
-            </div>
-            <div class="card">
-                <p class="card-title">Βάνα 5</p>
-                <p class="state"><span id="state5">Κλειστή</span></p>
-                <p><button id="valve5" class="button" onclick="toggle(this)">Αλλαγή</button></p>
-            </div>
-        </div>
+      </div>
     </div>
-    <script src="script.js"></script>
+    <div class="col-md-4">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title">Σχετική υγρασία</h5>
+          <p class="card-text">
+          <h3><span id="airHumidity"></span> &percnt;</h3>
+          </p>
+          <p>Κάτω όριο</p>
+          <p class="switch">
+            <input type="number" onchange="updateLimit(this)" id="limit3" min="0" max="100">
+          </p>
+          <p class="card-title">Άνω όριο</p>
+          <p class="switch">
+            <input type="number" onchange="updateLimit(this)" id="limit4" min="0" max="100">
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title">Υγρασία εδάφους</h5>
+          <p class="card-text">
+          <h3><span id="gndHumidity"></span> &percnt;</h3>
+          </p>
+          <p class="card-title">Κάτω όριο</p>
+          <p class="switch">
+            <input type="number" onchange="updateLimit(this)" id="limit5" min="0" max="100">
+          </p>
+          <p class="card-title">Άνω όριο</p>
+          <p class="switch">
+            <input type="number" onchange="updateLimit(this)" id="limit6" min="0" max="100">
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <!-- Υποσέλιδο -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 my-1 py-2 align-middle bg-success">
+        <h4 class="text-center pt-2">2023 - ΕΠΑΛ Καστοριάς</h4>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </body>
 
 </html>
