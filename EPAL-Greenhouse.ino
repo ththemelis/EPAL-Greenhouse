@@ -4,6 +4,8 @@
 //  https://m1cr0lab-esp32.github.io/remote-control-with-websocket/web-ui-design/
 //  https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
 //  https://palcarazm.github.io/bootstrap5-toggle/
+//  https://weekendprojects.dev/posts/how-to-pass-parameter-to-a-addeventlistener-function/
+//  https://www.geeksforgeeks.org/javascript-addeventlistener-with-examples/
 
 #include <WiFi.h>
 #include <WiFiMulti.h>
@@ -181,18 +183,22 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     }
     if (message.indexOf("1l") >= 0) {
       airTempLimit_floor = message.substring(2).toFloat();
+      checkValves();
       notifyClients(getLimitValues());
     }
     if (message.indexOf("2l") >= 0) {
       airTempLimit_ceil = message.substring(2).toFloat();
+      checkValves();
       notifyClients(getLimitValues());
     }  
     if (message.indexOf("3l") >= 0) {
       airHumLimit_floor = message.substring(2).toFloat();
+      checkValves();
       notifyClients(getLimitValues());
     }
     if (message.indexOf("4l") >= 0) {
       airHumLimit_ceil = message.substring(2).toFloat();
+      checkValves();
       notifyClients(getLimitValues());
     }  
     if (message.indexOf("5l") >= 0) {
@@ -213,7 +219,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       notifyClients(getValveValues());      
     }
     if (message.indexOf("getLimitValues") >= 0) {
-      notifyClients(getLimitValues());      
+      notifyClients(getLimitValues());
     }
   }
 }
