@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ΕΠΑΛ Καστοριάς - Έλεγχος θερμοκηπίου</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -19,18 +20,14 @@
       </div>
     </div>
   </div>
-
   <div class="container">
     <div class="row my-2 text-center">
       <!-- Τρόπος λειτουργίας της συσκευής -->
       <div class="col-md-2">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">Λειτουργία</h4>
-            <div class="form-check form-switch" style="--bs-form-switch-width: 50px; --bs-form-switch-height: 30px">
-              <input class="form-check-input" type="checkbox" role="switch" id="operation" onclick="toggleOp()" />
-              <label class="form-check-label px-3 py-1" for="operation" id="operationLabel">Χειροκίνητη</label>
-            </div>
+            <h4 id="operationLabel">Auto</h4>
+            <button class="btn btn-danger" id="operation" onclick="toggleOp()">Αλλαγή</button>
           </div>
         </div>
       </div>
@@ -93,13 +90,27 @@
           <h3><span id="airTemperature"></span> &deg;C</h3>
           </p>
           <p>Κάτω όριο</p>
-          <p class="switch">
+          <div class="d-flex justify-content-center">
+            <div class="wrapper">
+              <span class="minus1">-</span>
+              <span class="num1"></span>
+              <span class="plus1">+</span>
+            </div>
+          </div>
+          <!-- <p class="switch">
             <input type="number" onchange="updateLimit(this)" id="limit1" step="0.5" />
-          </p>
+          </p> -->
           <p>Άνω όριο</p>
-          <p class="switch">
+          <div class="d-flex justify-content-center">
+            <div class="wrapper">
+              <span class="minus2">-</span>
+              <span class="num2"></span>
+              <span class="plus2">+</span>
+            </div>
+          </div>
+          <!-- <p class="switch">
             <input type="number" onchange="updateLimit(this)" id="limit2" step="0.5" />
-          </p>
+          </p> -->
         </div>
       </div>
     </div>
@@ -150,8 +161,10 @@
       </div>
     </div>
   </div>
-  <script src="script.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+  <script src="./script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+    crossorigin="anonymous"></script>
 </body>
 
 </html>

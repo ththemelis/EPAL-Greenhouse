@@ -71,8 +71,8 @@ String getSensorReadings() {  // Λήψη τιμών από τους αισθη�
 }
 
 JSONVar limitValues;
-float airTempLimit_floor=22.0;
-float airTempLimit_ceil=32.0;
+int airTempLimit_floor=22;
+int airTempLimit_ceil=32;
 int airHumLimit_floor=60;
 int airHumLimit_ceil=90;
 int gndHumLimit_floor=60;
@@ -128,7 +128,7 @@ void closeAllValves() { // Απενεργοποίηση όλων των βανώ
 }
 
 void checkValves() {  // Έλεγχος των βανών ανάλογα με τις τιμές των αισθητήρων και των ορίων που έχουμε θέσει
-  if (airTempLimit_floor > airTemperature && operation) {
+  if (airTempLimit_floor > abs(airTemperature) && operation) {
     openAllValves();
   } else {
     closeAllValves();
