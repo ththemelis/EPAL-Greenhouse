@@ -32,7 +32,8 @@ void initWiFi() {   // Συνάρτηση ενεργοποίησης και σύ
   WiFi.mode(WIFI_STA);
   wifiMulti.addAP("argos", "21040672bill");
   wifiMulti.addAP("theo", "21040672bill");
-  wifiMulti.addAP(" Galaxy S23", "1234512345qw");
+  wifiMulti.addAP("Galaxy S23", "1234512345qw");
+  //sleep(1000);
   while (wifiMulti.run() != WL_CONNECTED) {
     delay(100);
     Serial.print(".");
@@ -255,8 +256,10 @@ void setup() {
   pinMode(valve5, OUTPUT);
   digitalWrite(ledPin, 0);
   setCpuFrequencyMhz(80);
-  initBME();
+
   initWiFi();
+  initBME();
+  
   initSPIFFS();
   initWebSocket();
 

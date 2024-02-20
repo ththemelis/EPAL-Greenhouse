@@ -3,10 +3,10 @@ var websocket;
 // Init web socket when the page loads
 window.addEventListener('load', onload);
 
-const plus1 = document.querySelector(".plus1"), minus1 = document.querySelector(".minus1"), num1 = document.querySelector(".num1");
-const plus2 = document.querySelector(".plus2"), minus2 = document.querySelector(".minus2"), num2 = document.querySelector(".num2");
+const TempCeilUp = document.querySelector(".TempCeilUp"), TempCeilDown = document.querySelector(".TempCeilDown"), TempCeil = document.querySelector(".TempCeil");
+const TempFloorUp = document.querySelector(".TempFloorUp"), TempFloorDown = document.querySelector(".TempFloorDown"), TempFloor = document.querySelector(".TempFloor");
 
-let limit1, limit2;
+let tempLimit, limit2;
 
 function onload(event) {
     initWebSocket();
@@ -140,13 +140,13 @@ function onMessage(event) {
     }
     if (myObj['airTempLimit_floor']) {
         // document.getElementById('limit1').value = myObj['airTempLimit_floor'];
-        limit1 = myObj['airTempLimit_floor'];
-        num1.innerText = limit1;
+        tempLimit = myObj['airTempLimit_floor'];
+        TempFloor.innerText = tempLimit;
     }
     if (myObj['airTempLimit_ceil']) {
         // document.getElementById('limit2').value = myObj['airTempLimit_ceil'];
         limit2 = myObj['airTempLimit_ceil'];
-        num2.innerText = limit2;
+        TempCeil.innerText = limit2;
     }
     if (myObj['airHumLimit_floor']) {
         document.getElementById('limit3').value = myObj['airHumLimit_floor'];
@@ -162,32 +162,32 @@ function onMessage(event) {
     }
 }
 
-plus1.addEventListener("click", () => {
-    if (limit1 < num2.innerHTML) {
-        limit1++;
-        num1.innerText = limit1;
-        websocket.send(1 + "l" + limit1);
+TempFloorUp.addEventListener("click", () => {
+    if (tempLimit < TempCeil.innerHTML - 1) {
+        tempLimit++;
+        TempFloor.innerText = tempLimit;
+        websocket.send(1 + "l" + tempLimit);
     }
 });
 
-minus1.addEventListener("click", () => {
-    if (limit1 > 20) {
-        limit1--;
-        num1.innerText = limit1;
-        websocket.send(1 + "l" + limit1);
+TempFloorDown.addEventListener("click", () => {
+    if (tempLimit > 20) {
+        tempLimit--;
+        TempFloor.innerText = tempLimit;
+        websocket.send(1 + "l" + tempLimit);
     }
 });
 
-plus2.addEventListener("click", () => {
+TempCeilUp.addEventListener("click", () => {
     limit2++;
-    num2.innerText = limit2;
+    TempCeil.innerText = limit2;
     websocket.send(2 + "l" + limit2);
 });
 
-minus2.addEventListener("click", () => {
-    if (limit2 > limit1) {
+TempCeilDown.addEventListener("click", () => {
+    if (limit2 - 1 > tempLimit) {
         limit2--;
-        num2.innerText = limit2;
+        TempCeil.innerText = limit2;
         websocket.send(2 + "l" + limit2);
     }
 });
